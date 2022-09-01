@@ -21,7 +21,7 @@ Native tonlib swift wrapper for [tonlib](https://github.com/labraburn/ton)
 )
 ```
 ## Usage
-```
+```swift
 // Create local passcode
 let passcode = "parole"
 
