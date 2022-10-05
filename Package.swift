@@ -9,7 +9,7 @@ let package = Package(
         .iOS(.v13),
         .tvOS(.v11),
         .macCatalyst(.v13),
-        .macOS(.v10_15),
+        .macOS(.v10_11),
     ],
     products: [
         .library(
@@ -35,11 +35,23 @@ let package = Package(
                 "CryptoSwift",
                 "BigInt",
                 "TON3",
+                "Fundamental",
             ],
             path: "Sources/SwiftyTON",
             resources: [
                 .copy("Resources/Configurations")
             ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug)),
+            ]
+        ),
+        .target(
+            name: "Fundamental",
+            dependencies: [
+                "CryptoSwift",
+                "BigInt",
+            ],
+            path: "Sources/Fundamental",
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
             ]
@@ -102,6 +114,10 @@ let package = Package(
         .testTarget(
             name: "SwiftyTONTests",
             dependencies: ["SwiftyTON"]
+        ),
+        .testTarget(
+            name: "FundamentalTests",
+            dependencies: ["Fundamental"]
         ),
     ],
     cxxLanguageStandard: .gnucxx14

@@ -611,7 +611,7 @@ extension GlossyTONWrapper {
     /// Resolve `.ton` to address
     ///
     /// - parameter rootDNSAccountAddress: address of root DNS contract account
-    /// - parameter name: domain nam e.g. `durov.ton`
+    /// - parameter name: domain nam e.g. `juston.ton`
     ///
     /// - throws: TODO
     /// - returns: fees for query
