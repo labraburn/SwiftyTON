@@ -44,7 +44,7 @@ else {
     fatalError()
 }
 
-// Parse address (and resolve, if needed) from example.ton or simple address string
+// Parse address (and resolve, if needed) from example.ton, example.t.me or simple address string
 guard let displayableAddress = await DisplayableAddress(string: "example.ton")
 else {
     fatalError()
