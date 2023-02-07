@@ -1,87 +1,72 @@
 //
-//  File.swift
-//  
-//
-//  Created by Anton Spivak on 16.07.2022.
+//  Created by Anton Spivak
 //
 
+import Buffer
 import Foundation
-import CryptoSwift
+
+// MARK: - Cell
 
 internal struct Cell {
-    
-    let storage: [Bit]
-    let children: [Cell]
-    let kind: Kind
-    
-    var hash: [UInt8] {
-        get throws {
-            try representation.bytes.sha256()
-        }
-    }
-    
-    init(
-        storage: [Bit],
-        children: [Cell],
-        kind: Kind = .ordinary
-    ) {
+    // MARK: Lifecycle
+
+    init(storage: Binary, children: [Cell], kind: Kind = .ordinary) {
         self.storage = storage
         self.children = children
         self.kind = kind
     }
+
+    // MARK: Internal
+
+    let storage: Binary
+    let children: [Cell]
+    let kind: Kind
+
+    var hash: Buffer {
+        Buffer(binary: representation, endianness: .big).sha256
+    }
 }
 
 private extension Cell {
-    
-    var maximumDepth: [Bit] {
-        get throws {
-            let maximumDepth = _calculatedMaximumDepth()
-            let value = Int64(floor(Double(maximumDepth) / 256)) + (maximumDepth % 256)
-            return try value.bits
-        }
+    var maximumDepth: [BinaryElement] {
+        let maximumDepth = _calculatedMaximumDepth()
+        let value = Int64(floor(Double(maximumDepth) / 256)) + (maximumDepth % 256)
+        return value.binary()
     }
 
-    var referencesDescriptor: [Bit] {
-        get throws {
-            let isExotic = kind == .exotic
-            let maximumLevel = _calculatedMaximumLevel()
-            let value = Int64(children.count) + (isExotic ? 1 : 0) * 8 + maximumLevel * 32
-            return try value.bits
-        }
+    var referencesDescriptor: [BinaryElement] {
+        let isExotic = kind == .exotic
+        let maximumLevel = _calculatedMaximumLevel()
+        let value = Int64(children.count) + (isExotic ? 1 : 0) * 8 + maximumLevel * 32
+        return value.binary()
     }
 
-    var storageDescriptor: [Bit] {
-        get throws {
-            let value = Int64(ceil(Double(storage.count / 8))) + Int64(floor(Double(storage.count / 8)))
-            return try value.bits
-        }
+    var storageDescriptor: [BinaryElement] {
+        let value = Int64(ceil(Double(storage.count / 8))) + Int64(floor(Double(storage.count / 8)))
+        return value.binary()
     }
 
-    var descriptors: [Bit] {
-        get throws {
-            var value = try referencesDescriptor
-            value.append(contentsOf: try storageDescriptor)
-            return value
-        }
+    var descriptors: [BinaryElement] {
+        var value = referencesDescriptor
+        value.append(contentsOf: storageDescriptor)
+        return value
     }
 
-    var representation: [Bit] {
-        get throws {
-            var representation = try descriptors
-            representation.append(contentsOf: storage.augmented())
+    var representation: [BinaryElement] {
+        var representation = descriptors
+        representation.append(contentsOf: storage.augmented())
 
-            try children.forEach({
-                let depth = try $0.maximumDepth
-                representation.append(contentsOf: depth)
-            })
+        children.forEach({
+            let depth = $0.maximumDepth
+            representation.append(contentsOf: depth)
+        })
 
-            try children.forEach({
-                let bits = try $0.hash.bits
-                representation.append(contentsOf: bits)
-            })
+        children.forEach({
+            let bits = $0.hash.binary()
+            representation.append(contentsOf: bits)
+        })
 
-            return representation
-        }
+        return representation
     }
 
     func _calculatedMaximumDepth() -> Int64 {
@@ -104,22 +89,24 @@ private extension Cell {
 }
 
 internal extension Cell {
-    
     func serialize<T>(
         with map: [HEX: Int],
         childrenIndexType: T.Type
-    ) throws -> [Bit] where T: BitsConvertible, T: FixedWidthInteger {
+    ) throws -> [BinaryElement] where T: BinaryConvertible, T: FixedWidthInteger {
         try children.reduce(
-            into: try descriptors + storage.augmented(),
+            into: descriptors + storage.augmented(),
             { bits, children in
-                let childrenIndex = try map[children.hash.toHexString()]
+                let childrenIndex = map[children.hash.hex]
                 guard let childrenIndex = childrenIndex
                 else {
                     throw CellCondingError(.serializeError)
                 }
-                
-                try bits.append(
-                    contentsOf: childrenIndexType.init(childrenIndex).bits
+
+                bits.append(
+                    contentsOf: childrenIndexType.init(childrenIndex).binary(
+                        endianness: .big,
+                        truncation: .none
+                    )
                 )
             }
         )
@@ -127,55 +114,51 @@ internal extension Cell {
 }
 
 internal extension Cell {
-    
     struct BreadthFirstSortResult {
-        
         let cells: [Cell]
         let map: [String: Int]
     }
-    
-    func breadthFirstSort() throws -> BreadthFirstSortResult {
-        
+
+    func breadthFirstSort() -> BreadthFirstSortResult {
         struct StackElement {
-            
             let cell: Cell
             let hash: [UInt8]
         }
-        
+
         var map = [String: Int]()
         var stack = [self]
         var cells = [
             StackElement(
                 cell: self,
-                hash: try hash
-            )
+                hash: hash
+            ),
         ]
-        
-        map[cells[0].hash.toHexString()] = 0
-        
+
+        map[cells[0].hash.hex] = 0
+
         // Add cell to cells list and to hashmap
         let append = { (node: Cell, hash: [UInt8]) in
             cells.append(StackElement(cell: node, hash: hash))
-            map[hash.toHexString()] = cells.count - 1
+            map[hash.hex] = cells.count - 1
         }
-        
+
         // Reorder cells list and hashmap if duplicate found
         let reappend = { (index: Int) in
             // Move cell to the last position of array
             cells.append(cells.remove(at: index))
             // Change hash indexes after pulling cell from the middle of an array
-            Array(cells[0 ..< index]).forEachi({ (element, i) in
-                map[element.hash.toHexString()] = index + i
+            Array(cells[0 ..< index]).forEachi({ element, i in
+                map[element.hash.hex] = index + i
             })
         }
-        
+
         // Process tree node to ordered cells list
-        let process = { (node: Cell) throws in
-            let hash = try node.hash
-            let index = map[hash.toHexString()]
-            
+        let process = { (node: Cell) in
+            let hash = node.hash
+            let index = map[hash.hex]
+
             stack.append(node)
-            
+
             if let index = index {
                 reappend(index)
             } else {
@@ -186,19 +169,54 @@ internal extension Cell {
         // Loop through multi-tree and make breadth-first search till last node
         while !stack.isEmpty {
             let count = stack.count
-            try stack.forEach({ node in
-                try node.children.forEach({ children in
-                    try process(children)
+            stack.forEach({ node in
+                node.children.forEach({ children in
+                    process(children)
                 })
             })
             stack.removeFirst(count)
         }
-        
+
         return BreadthFirstSortResult(
             cells: cells.map({
                 $0.cell
             }),
             map: map
         )
+    }
+}
+
+internal extension Binary {
+    enum AugmentingDivider: Int {
+        case four = 4
+        case eight = 8
+    }
+
+    /// Augment bits with initial `BinaryElement.one` and leading 0 to be divisible by 8 or 4
+    /// without remainder.
+    func augmented(to divider: AugmentingDivider = .eight) -> [Element] {
+        var result = self
+
+        let damount = count % divider.rawValue
+        let appendix = [Element](repeating: .zero, count: divider.rawValue - damount).mapi({
+            $1 == 0 ? Element.one : .zero
+        })
+
+        if !appendix.isEmpty && appendix.count != divider.rawValue {
+            result.append(contentsOf: appendix)
+        }
+
+        return result
+    }
+
+    /// Remove previously augmented bits
+    func rollback() -> [Element] {
+        let index = lastIndex(of: .one)
+        guard let index = index,
+              index > count - 8
+        else {
+            return Array(self)
+        }
+        return Array(self[0 ..< index])
     }
 }

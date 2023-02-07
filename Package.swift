@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -9,7 +9,7 @@ let package = Package(
         .iOS(.v13),
         .tvOS(.v11),
         .macCatalyst(.v13),
-        .macOS(.v10_11),
+        .macOS(.v10_13),
     ],
     products: [
         .library(
@@ -25,7 +25,7 @@ let package = Package(
         .package(
             url: "https://github.com/krzyzanowskim/CryptoSwift.git",
             .upToNextMajor(from: "1.4.3")
-        )
+        ),
     ],
     targets: [
         .target(
@@ -39,7 +39,7 @@ let package = Package(
             ],
             path: "Sources/SwiftyTON",
             resources: [
-                .copy("Resources/Configurations")
+                .copy("Resources/Configurations"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
@@ -50,8 +50,17 @@ let package = Package(
             dependencies: [
                 "CryptoSwift",
                 "BigInt",
+                "Buffer",
             ],
             path: "Sources/Fundamental",
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug)),
+            ]
+        ),
+        .target(
+            name: "Buffer",
+            dependencies: [],
+            path: "Sources/Buffer",
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
             ]
@@ -60,7 +69,7 @@ let package = Package(
             name: "GlossyTON",
             dependencies: [
                 "TON",
-                "OpenSSL"
+                "OpenSSL",
             ],
             path: "Sources/GlossyTON",
             publicHeadersPath: "Include",
@@ -71,18 +80,18 @@ let package = Package(
                 .define("DEBUG", to: "1", .when(configuration: .debug)),
             ],
             linkerSettings: [
-                .linkedLibrary("z", .when(platforms: [.macOS, .macCatalyst]))
+                .linkedLibrary("z", .when(platforms: [.macOS, .macCatalyst])),
             ]
         ),
         .target(
             name: "TON3",
             dependencies: [
                 "CryptoSwift",
-                "SwiftyJS"
+                "SwiftyJS",
             ],
             path: "Sources/TON3",
             resources: [
-                .copy("Resources/ton3-core.bundle")
+                .copy("Resources/ton3-core.bundle"),
             ],
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
@@ -118,6 +127,10 @@ let package = Package(
         .testTarget(
             name: "FundamentalTests",
             dependencies: ["Fundamental"]
+        ),
+        .testTarget(
+            name: "BufferTests",
+            dependencies: ["Buffer"]
         ),
     ],
     cxxLanguageStandard: .gnucxx14

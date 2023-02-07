@@ -1,10 +1,15 @@
 //
-//  File.swift
-//  
-//
-//  Created by Anton Spivak on 07.08.2022.
+//  Created by Anton Spivak
 //
 
-import Foundation
+// MARK: - CellEncodable
 
-typealias CellCodable = CellEncodable
+public protocol CellEncodable {
+    func encode(with encoder: CellEncoderContainer) throws
+}
+
+// MARK: - CellDecodable
+
+public protocol CellDecodable {}
+
+public typealias CellCodable = CellEncodable & CellDecodable

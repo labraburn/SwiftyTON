@@ -1,45 +1,47 @@
 //
-//  File.swift
-//  
-//
-//  Created by Anton Spivak on 18.07.2022.
+//  Created by Anton Spivak
 //
 
 import Foundation
 
+// MARK: - CodingError
+
 public struct CodingError {
-    
-    public let code: Code
-    
-    public init(
-        _ code: Code
-    ) {
+    // MARK: Lifecycle
+
+    public init(_ code: Code) {
         self.code = code
     }
+
+    // MARK: Public
+
+    public let code: Code
 }
 
-public extension CodingError {
-    
-    struct Code : RawRepresentable, Hashable, Sendable {
+// MARK: CodingError.Code
 
-        public let rawValue: Int
-        
-        public init(
-            rawValue: Int
-        ) {
+public extension CodingError {
+    struct Code: RawRepresentable, Hashable, Sendable {
+        // MARK: Lifecycle
+
+        public init(rawValue: Int) {
             self.rawValue = rawValue
         }
+
+        // MARK: Public
+
+        public let rawValue: Int
     }
 }
 
 public extension CodingError.Code {
-    
     static let cellsEmpty = CodingError.Code(rawValue: 0)
     static let maximumRootCellsOverflow = CodingError.Code(rawValue: 0)
 }
 
+// MARK: - CodingError + LocalizedError
+
 extension CodingError: LocalizedError {
-    
     public var errorDescription: String? {
         switch code {
         case .maximumRootCellsOverflow:

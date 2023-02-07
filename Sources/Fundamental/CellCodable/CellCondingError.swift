@@ -1,39 +1,40 @@
 //
-//  File.swift
-//
-//
-//  Created by Anton Spivak on 17.07.2022.
+//  Created by Anton Spivak
 //
 
 import Foundation
 
+// MARK: - CellCondingError
+
 public struct CellCondingError {
-    
-    public let code: Code
-    
-    public init(
-        _ code: Code
-    ) {
+    // MARK: Lifecycle
+
+    public init(_ code: Code) {
         self.code = code
     }
+
+    // MARK: Public
+
+    public let code: Code
 }
 
-public extension CellCondingError {
-    
-    struct Code : RawRepresentable, Hashable, Sendable {
+// MARK: CellCondingError.Code
 
-        public let rawValue: Int
-        
-        public init(
-            rawValue: Int
-        ) {
+public extension CellCondingError {
+    struct Code: RawRepresentable, Hashable, Sendable {
+        // MARK: Lifecycle
+
+        public init(rawValue: Int) {
             self.rawValue = rawValue
         }
+
+        // MARK: Public
+
+        public let rawValue: Int
     }
 }
 
 public extension CellCondingError.Code {
-    
     static let storageOverflow = CellCondingError.Code(rawValue: 0)
     static let childrenOverflow = CellCondingError.Code(rawValue: 1)
     static let byteBitsCount = CellCondingError.Code(rawValue: 2)
@@ -42,22 +43,23 @@ public extension CellCondingError.Code {
     static let serializeError = CellCondingError.Code(rawValue: 5)
 }
 
+// MARK: - CellCondingError + LocalizedError
+
 extension CellCondingError: LocalizedError {
-    
     public var errorDescription: String? {
         switch code {
         case .storageOverflow:
-            return "Cell bits storage overflow"
+            return "Cell bits storage overflow."
         case .childrenOverflow:
-            return "Cell children references overflow"
+            return "Cell children references overflow."
         case .byteBitsCount:
-            return "Byte can be initialized only with 8 bits"
+            return "Byte can be initialized only with 8 bits."
         case .notUTF8string:
-            return "Can't encode/decode UTF8 string"
+            return "Can't encode/decode UTF8 string."
         case .wrongBytesCount:
-            return "Bytes count mismatch"
+            return "Bytes count mismatch."
         case .serializeError:
-            return "Can't serialize cell"
+            return "Can't serialize cell."
         default:
             return nil
         }

@@ -1,19 +1,14 @@
 //
-//  File.swift
-//  
+//  Created by Anton Spivak
 //
-//  Created by Anton Spivak on 05.08.2022.
-//
-
-import Foundation
 
 public extension Array {
-    
     /// Returns an array containing the results of mapping the given closure
     /// over the sequence's elements.
     ///
     /// - Parameter transform: A mapping closure. `transform` accepts an
-    ///   element of this sequence as its parameter and index of this element and returns a transformed
+    ///   element of this sequence as its parameter and index of this element and returns a
+    /// transformed
     ///   value of the same or of a different type.
     /// - Returns: An array containing the transformed elements of this
     ///   sequence.
@@ -25,7 +20,7 @@ public extension Array {
             return result
         })
     }
-    
+
     /// Calls the given closure on each element in the sequence in the same order
     /// as a `for`-`in` loop.
     ///

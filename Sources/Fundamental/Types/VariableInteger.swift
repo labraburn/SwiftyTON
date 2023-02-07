@@ -1,33 +1,33 @@
 //
-//  File.swift
-//  
-//
-//  Created by Anton Spivak on 05.08.2022.
+//  Created by Anton Spivak
 //
 
-import Foundation
-import BigInt
+import Buffer
 
-public enum VariableInteger {
-    
-    case int(value: BigInt, length: Int)
-    case uint(value: BigUInt, length: Int)
-    
-    var length: Int {
-        switch self {
-        case let .int(_, length):
-            return length
-        case let .uint(_, length):
-            return length
-        }
+// MARK: - VariableInteger
+
+public protocol VariableInteger {
+    associatedtype Value: BinaryInteger
+
+    var length: Int { get }
+    var value: Value { get }
+
+    var isZero: Bool { get }
+
+    init(_ value: Value, length: Int)
+}
+
+// MARK: BufferRepresentable
+
+public extension VariableInteger where Value: BufferRepresentable {
+    init(buffer: Buffer, endianness: Endianness = .big) {
+        fatalError("TODO: //")
     }
-    
-    var isZero: Bool {
-        switch self {
-        case let .int(value, _):
-            return value.isZero
-        case let .uint(value, _):
-            return value.isZero
-        }
+
+    func buffer(
+        endianness: Endianness = .big,
+        truncation: BufferTruncation = .none
+    ) -> Buffer {
+        value.buffer(endianness: endianness, truncation: truncation)
     }
 }

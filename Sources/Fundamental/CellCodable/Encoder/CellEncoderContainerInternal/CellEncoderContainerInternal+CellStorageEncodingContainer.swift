@@ -1,20 +1,14 @@
 //
-//  File.swift
-//  
-//
-//  Created by Anton Spivak on 07.08.2022.
+//  Created by Anton Spivak
 //
 
-import Foundation
+import Buffer
 
 extension CellEncoderContainerInternal: CellStorageEncodingContainer {
-    
-    func encode<T>(
-        _ value: T
-    ) throws where T : CellEncodable {
-        if let value = value as? Bit {
+    func encode<T>(_ value: T) throws where T: CellEncodable {
+        if let value = value as? BinaryElement {
             try append([value])
-        } else if let value = value as? [Bit] {
+        } else if let value = value as? [BinaryElement] {
             try append(value)
         } else {
             try value.encode(with: self)
