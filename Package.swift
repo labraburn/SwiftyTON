@@ -26,6 +26,7 @@ let package = Package(
             url: "https://github.com/krzyzanowskim/CryptoSwift.git",
             .upToNextMajor(from: "1.4.3")
         ),
+        .package(url: "https://github.com/whalescorp/buffbit", .upToNextMajor(from: "0.1.0")),
     ],
     targets: [
         .target(
@@ -50,17 +51,9 @@ let package = Package(
             dependencies: [
                 "CryptoSwift",
                 "BigInt",
-                "Buffer",
+                .product(name: "Buffbit", package: "buffbit"),
             ],
             path: "Sources/Fundamental",
-            swiftSettings: [
-                .define("DEBUG", .when(configuration: .debug)),
-            ]
-        ),
-        .target(
-            name: "Buffer",
-            dependencies: [],
-            path: "Sources/Buffer",
             swiftSettings: [
                 .define("DEBUG", .when(configuration: .debug)),
             ]
@@ -127,10 +120,6 @@ let package = Package(
         .testTarget(
             name: "FundamentalTests",
             dependencies: ["Fundamental"]
-        ),
-        .testTarget(
-            name: "BufferTests",
-            dependencies: ["Buffer"]
         ),
     ],
     cxxLanguageStandard: .gnucxx14

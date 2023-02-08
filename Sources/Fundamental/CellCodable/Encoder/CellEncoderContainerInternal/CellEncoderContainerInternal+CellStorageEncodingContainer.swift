@@ -2,7 +2,7 @@
 //  Created by Anton Spivak
 //
 
-import Buffer
+import Buffbit
 
 extension CellEncoderContainerInternal: CellStorageEncodingContainer {
     func encode<T>(_ value: T) throws where T: CellEncodable {

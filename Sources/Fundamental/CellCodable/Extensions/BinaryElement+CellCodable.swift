@@ -2,7 +2,7 @@
 //  Created by Anton Spivak
 //
 
-import Buffer
+import Buffbit
 
 extension BinaryElement: CellCodable {
     public func encode(with encoder: CellEncoderContainer) throws {

@@ -2,7 +2,7 @@
 //  Created by Anton Spivak
 //
 
-import Buffer
+import Buffbit
 
 // MARK: - VariableInteger
 

@@ -3,7 +3,7 @@
 //
 
 import BigInt
-import Buffer
+import Buffbit
 
 public struct CellEncoder {
     // MARK: Lifecycle

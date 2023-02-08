@@ -3,7 +3,7 @@
 //
 
 import BigInt
-import Buffer
+import Buffbit
 
 public extension CellEncodable where Self: BinaryConvertible {
     func encode(with encoder: CellEncoderContainer) throws {

@@ -3,7 +3,7 @@
 //
 
 import BigInt
-import Buffer
+import Buffbit
 
 // MARK: - VarInt
 
