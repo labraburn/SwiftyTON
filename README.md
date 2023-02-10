@@ -68,10 +68,15 @@ default:
     break
 }
 
+guard let wallet = AnyWallet(contract: contract) else {
+  fatalError()
+}
+
 let message = try await wallet.subsequentTransferMessage(
     to: displayableAddress.concreteAddress,
-    amount: Currency("0.5"), // 0.5 TON
+    amount: Currency(0.5), // 0.5 TON
     message: ("SwiftyTON".data(using: .utf8), nil),
+    key: key,
     passcode: passcode
 )
 
