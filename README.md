@@ -89,3 +89,7 @@ try await message.send() // send transaction
 ## Notes
 - This is **alpha** version
 - API can be changed and will be changed
+
+## Authors
+
+- anton@stragner.com (stragner.ton)
