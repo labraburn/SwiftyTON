@@ -26,7 +26,7 @@ let package = Package(
             url: "https://github.com/krzyzanowskim/CryptoSwift.git",
             .upToNextMajor(from: "1.4.3")
         ),
-        .package(url: "https://github.com/whalescorp/buffbit", .upToNextMajor(from: "0.1.0")),
+        .package(url: "https://github.com/wollut/buffbit", .upToNextMajor(from: "0.1.0")),
     ],
     targets: [
         .target(
