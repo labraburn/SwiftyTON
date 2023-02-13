@@ -92,4 +92,4 @@ try await message.send() // send transaction
 
 ## Authors
 
-- anton@stragner.com (stragner.ton)
+- anton@labraburn.com (stragner.ton)
